@@ -1,0 +1,56 @@
+{
+  "name": "comfy-ui-client",
+  "version": "0.1.0",
+  "packageManager": "pnpm@7.5.0",
+  "description": "WebSockets API client for ComfyUI",
+  "author": "Punnawut Khowkittipaiboon <me@itskaynine.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/itsKaynine/comfy-ui-client",
+  "repository": "github:itsKaynine/comfy-ui-client",
+  "bugs": "https://github.com/itsKaynine/comfy-ui-client/issues",
+  "keywords": [
+    "comfy-ui",
+    "comfy-ui node",
+    "comfy-ui node API",
+    "comfy-ui API",
+    "comfy-ui sdk",
+    "comfy-ui-node",
+    "comfy-ui-node-api",
+    "comfy-ui-client",
+    "comfy-ui-sdk"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --dts --format cjs,esm",
+    "dev": "npm run build --watch",
+    "lint": "eslint .",
+    "prettier": "prettier --config .prettierrc --write ./src"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.8",
+    "@types/node": "^18.11.14",
+    "@types/uuid": "^9.0.2",
+    "@types/ws": "^8.5.5",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "tsup": "^7.1.0",
+    "typescript": "~5.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js"
+  },
+  "devDependencies": {
+    "comfy-ui-client": "workspace:*",
+    "commander": "^11.0.0",
+    "prettier": "^3.0.0"
+  }
+}
