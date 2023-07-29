@@ -85,10 +85,10 @@ const prompt: Prompt = {
 };
 
 // Set the text prompt for our positive CLIPTextEncode
-prompt['6'].inputs.text = 'masterpiece best quality man'
+prompt['6'].inputs.text = 'masterpiece best quality man';
 
 // Set the seed for our KSampler node
-prompt['3'].inputs.seed = 5
+prompt['3'].inputs.seed = 5;
 
 // Create client
 const serverAddress = '127.0.0.1:8188';
