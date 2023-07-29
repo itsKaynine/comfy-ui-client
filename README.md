@@ -7,6 +7,14 @@ Node.js [ComfyUI](https://github.com/comfyanonymous/ComfyUI) client based on the
 
 See example in [`examples/generate`][examples-generate].
 
+## Install
+
+To install `comfy-ui-client` in an existing project:
+
+```sh
+npm install comfy-ui-client
+```
+
 ## Example Usage
 
 ```ts
