@@ -88,6 +88,7 @@ await client.connect();
 const images = await client.getImages(prompt);
 
 // Save images to file
+const outputDir = './tmp/output';
 await client.saveImages(images, outputDir);
 
 // Disconnect
