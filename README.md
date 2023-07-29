@@ -3,7 +3,7 @@
 [![npm][badge-version]][npm]
 [![license][badge-license]][license]
 
-Node.js ComfyUI client based on the [WebSockets API example](https://github.com/comfyanonymous/ComfyUI/blob/master/script_examples/websockets_api_example.py).
+Node.js [ComfyUI](https://github.com/comfyanonymous/ComfyUI) client based on the [WebSockets API example](https://github.com/comfyanonymous/ComfyUI/blob/master/script_examples/websockets_api_example.py).
 
 See example in [`examples/generate`][examples-generate].
 
