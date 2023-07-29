@@ -1,6 +1,7 @@
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 
+import pino from 'pino';
 import WebSocket from 'ws';
 
 import type {
@@ -12,6 +13,11 @@ import type {
   ResponseError,
   UploadImageResult,
 } from './types.js';
+
+// TODO: Make logger customizable
+const logger = pino({
+  level: 'info',
+});
 
 export class ComfyUIClient {
   public serverAddress: string;
@@ -32,28 +38,30 @@ export class ComfyUIClient {
 
       const url = `ws://${this.serverAddress}/ws?clientId=${this.clientId}`;
 
-      console.log(`Connecting to url: ${url}`);
+      logger.info(`Connecting to url: ${url}`);
 
       this.ws = new WebSocket(url, {
         perMessageDeflate: false,
       });
 
       this.ws.on('open', () => {
-        console.log('Connection open');
+        logger.info('Connection open');
         resolve();
       });
 
       this.ws.on('close', () => {
-        console.log('Connection closed');
+        logger.info('Connection closed');
       });
 
-      this.ws.on('error', console.error);
+      this.ws.on('error', (err) => {
+        logger.error({ err }, 'WebSockets error');
+      });
 
       this.ws.on('message', (data, isBinary) => {
         if (isBinary) {
-          console.log('Received binary data');
+          logger.debug('Received binary data');
         } else {
-          console.log('Received data', data.toString());
+          logger.debug('Received data: %s', data.toString());
         }
       });
     });
@@ -175,7 +183,8 @@ export class ComfyUIClient {
             const messageData = message.data;
             if (!messageData.node) {
               const donePromptId = messageData.prompt_id;
-              console.log(`Done executing prompt (ID: ${donePromptId})`);
+
+              logger.info(`Done executing prompt (ID: ${donePromptId})`);
 
               // Execution is done
               if (messageData.prompt_id === promptId) {
