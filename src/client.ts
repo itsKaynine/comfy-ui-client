@@ -5,13 +5,21 @@ import pino from 'pino';
 import WebSocket from 'ws';
 
 import type {
+  EditHistoryRequest,
+  FolderName,
   HistoryResult,
   ImageContainer,
+  ImageRef,
   ImagesResponse,
+  ObjectInfoResponse,
   Prompt,
+  PromptQueueResponse,
   QueuePromptResult,
+  QueueResponse,
   ResponseError,
+  SystemStatsResponse,
   UploadImageResult,
+  ViewMetadataResponse,
 } from './types.js';
 
 // TODO: Make logger customizable
@@ -74,6 +82,30 @@ export class ComfyUIClient {
     }
   }
 
+  async get_embeddings(): Promise<string[]> {
+    const res = await fetch(`http://${this.serverAddress}/embeddings`);
+
+    const json: string[] | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
+  async get_extensions(): Promise<string[]> {
+    const res = await fetch(`http://${this.serverAddress}/extensions`);
+
+    const json: string[] | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
   async queuePrompt(prompt: Prompt): Promise<QueuePromptResult> {
     const res = await fetch(`http://${this.serverAddress}/prompt`, {
       method: 'POST',
@@ -96,14 +128,80 @@ export class ComfyUIClient {
     return json;
   }
 
+  async interrupt(): Promise<void> {
+    const res = await fetch(`http://${this.serverAddress}/interrupt`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const json: QueuePromptResult | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+  }
+
+  async editHistory(params: EditHistoryRequest): Promise<void> {
+    const res = await fetch(`http://${this.serverAddress}/history`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+
+    const json: QueuePromptResult | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+  }
+
   async uploadImage(
     image: Buffer,
     filename: string,
+    overwrite?: boolean,
   ): Promise<UploadImageResult> {
     const formData = new FormData();
     formData.append('image', new Blob([image]), filename);
 
+    if (overwrite !== undefined) {
+      formData.append('overwrite', overwrite.toString());
+    }
+
     const res = await fetch(`http://${this.serverAddress}/upload/image`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    const json: UploadImageResult | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
+  async uploadMask(
+    image: Buffer,
+    filename: string,
+    originalRef: ImageRef,
+    overwrite?: boolean,
+  ): Promise<UploadImageResult> {
+    const formData = new FormData();
+    formData.append('image', new Blob([image]), filename);
+    formData.append('originalRef', JSON.stringify(originalRef));
+
+    if (overwrite !== undefined) {
+      formData.append('overwrite', overwrite.toString());
+    }
+
+    const res = await fetch(`http://${this.serverAddress}/upload/mask`, {
       method: 'POST',
       body: formData,
     });
@@ -135,10 +233,81 @@ export class ComfyUIClient {
     return blob;
   }
 
-  async getHistory(promptId: string): Promise<HistoryResult> {
-    const res = await fetch(`http://${this.serverAddress}/history/${promptId}`);
+  async viewMetadata(
+    folderName: FolderName,
+    filename: string,
+  ): Promise<ViewMetadataResponse> {
+    const res = await fetch(
+      `http://${this.serverAddress}/view_metadata/${folderName}?filename=${filename}`,
+    );
+
+    const json: ViewMetadataResponse | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
+  async getSystemStats(): Promise<SystemStatsResponse> {
+    const res = await fetch(`http://${this.serverAddress}/system_stats`);
+
+    const json: SystemStatsResponse | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
+  async getPrompt(): Promise<PromptQueueResponse> {
+    const res = await fetch(`http://${this.serverAddress}/prompt`);
+
+    const json: PromptQueueResponse | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
+  async getObjectInfo(nodeClass?: string): Promise<ObjectInfoResponse> {
+    const res = await fetch(
+      `http://${this.serverAddress}/object_info` + nodeClass
+        ? `/${nodeClass}`
+        : '',
+    );
+
+    const json: ObjectInfoResponse | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
+  async getHistory(promptId?: string): Promise<HistoryResult> {
+    const res = await fetch(
+      `http://${this.serverAddress}/history` + promptId ? `/${promptId}` : '',
+    );
 
     const json: HistoryResult | ResponseError = await res.json();
+
+    if ('error' in json) {
+      throw new Error(JSON.stringify(json));
+    }
+
+    return json;
+  }
+
+  async getQueue(): Promise<QueueResponse> {
+    const res = await fetch(`http://${this.serverAddress}/queue`);
+
+    const json: QueueResponse | ResponseError = await res.json();
 
     if ('error' in json) {
       throw new Error(JSON.stringify(json));
