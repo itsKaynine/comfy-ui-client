@@ -18,8 +18,6 @@ npm install comfy-ui-client
 ## Example Usage
 
 ```ts
-import { v4 as uuidv4 } from 'uuid';
-
 import { ComfyUIClient } from 'comfy-ui-client';
 import type { Prompt } from 'comfy-ui-client';
 
@@ -92,7 +90,7 @@ prompt['3'].inputs.seed = 5;
 
 // Create client
 const serverAddress = '127.0.0.1:8188';
-const clientId = uuidv4();
+const clientId = 'baadbabe-b00b-4206-9420-deadd00d1337';
 const client = new ComfyUIClient(serverAddress, clientId);
 
 // Connect to server
