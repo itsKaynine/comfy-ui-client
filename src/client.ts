@@ -82,7 +82,7 @@ export class ComfyUIClient {
     }
   }
 
-  async get_embeddings(): Promise<string[]> {
+  async getEmbeddings(): Promise<string[]> {
     const res = await fetch(`http://${this.serverAddress}/embeddings`);
 
     const json: string[] | ResponseError = await res.json();
@@ -94,7 +94,7 @@ export class ComfyUIClient {
     return json;
   }
 
-  async get_extensions(): Promise<string[]> {
+  async getExtensions(): Promise<string[]> {
     const res = await fetch(`http://${this.serverAddress}/extensions`);
 
     const json: string[] | ResponseError = await res.json();
