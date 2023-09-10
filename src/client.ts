@@ -276,9 +276,8 @@ export class ComfyUIClient {
 
   async getObjectInfo(nodeClass?: string): Promise<ObjectInfoResponse> {
     const res = await fetch(
-      `http://${this.serverAddress}/object_info` + nodeClass
-        ? `/${nodeClass}`
-        : '',
+      `http://${this.serverAddress}/object_info` +
+        (nodeClass ? `/${nodeClass}` : ''),
     );
 
     const json: ObjectInfoResponse | ResponseError = await res.json();
@@ -292,7 +291,7 @@ export class ComfyUIClient {
 
   async getHistory(promptId?: string): Promise<HistoryResult> {
     const res = await fetch(
-      `http://${this.serverAddress}/history` + promptId ? `/${promptId}` : '',
+      `http://${this.serverAddress}/history` + (promptId ? `/${promptId}` : ''),
     );
 
     const json: HistoryResult | ResponseError = await res.json();
