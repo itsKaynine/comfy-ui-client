@@ -2,6 +2,9 @@
   "name": "comfy-ui-client",
   "version": "0.1.1",
   "packageManager": "pnpm@7.5.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "description": "WebSockets API client for ComfyUI",
   "author": "Punnawut Khowkittipaiboon <me@itskaynine.com>",
   "license": "MIT",
