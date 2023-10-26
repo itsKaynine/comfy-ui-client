@@ -41,6 +41,10 @@ export class ComfyUIClient {
     );
   }
 
+  get ws() {
+    return this._ws;
+  }
+
   connect() {
     return new Promise<void>(async (resolve) => {
       if (this._ws) {
