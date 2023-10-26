@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 
-import pino from 'pino';
+import pino, { type Logger } from 'pino';
 import WebSocket from 'ws';
 
 import type {
@@ -20,65 +20,68 @@ import type {
   SystemStatsResponse,
   UploadImageResult,
   ViewMetadataResponse,
-} from './types.js';
-
-// TODO: Make logger customizable
-const logger = pino({
-  level: 'info',
-});
+} from './comfyTypes.js';
+import type { ComfyUIClientConfig } from './types.js';
 
 export class ComfyUIClient {
   public serverAddress: string;
   public clientId: string;
 
-  protected ws?: WebSocket;
+  protected _ws?: WebSocket;
+  protected _logger: Logger;
 
-  constructor(serverAddress: string, clientId: string) {
-    this.serverAddress = serverAddress;
-    this.clientId = clientId;
+  constructor(config: ComfyUIClientConfig) {
+    this.serverAddress = config.serverAddress;
+    this.clientId = config.clientId;
+
+    this._logger = pino(
+      config.logger ?? {
+        enabled: false,
+      },
+    );
   }
 
   connect() {
     return new Promise<void>(async (resolve) => {
-      if (this.ws) {
+      if (this._ws) {
         await this.disconnect();
       }
 
       const url = `ws://${this.serverAddress}/ws?clientId=${this.clientId}`;
 
-      logger.info(`Connecting to url: ${url}`);
+      this._logger.info(`Connecting to url: ${url}`);
 
-      this.ws = new WebSocket(url, {
+      this._ws = new WebSocket(url, {
         perMessageDeflate: false,
       });
 
-      this.ws.on('open', () => {
-        logger.info('Connection open');
+      this._ws.on('open', () => {
+        this._logger.info('Connection open');
         resolve();
       });
 
-      this.ws.on('close', () => {
-        logger.info('Connection closed');
+      this._ws.on('close', () => {
+        this._logger.info('Connection closed');
       });
 
-      this.ws.on('error', (err) => {
-        logger.error({ err }, 'WebSockets error');
+      this._ws.on('error', (err) => {
+        this._logger.error({ err }, 'WebSockets error');
       });
 
-      this.ws.on('message', (data, isBinary) => {
+      this._ws.on('message', (data, isBinary) => {
         if (isBinary) {
-          logger.debug('Received binary data');
+          this._logger.debug('Received binary data');
         } else {
-          logger.debug('Received data: %s', data.toString());
+          this._logger.debug('Received data: %s', data.toString());
         }
       });
     });
   }
 
   async disconnect() {
-    if (this.ws) {
-      this.ws.close();
-      this.ws = undefined;
+    if (this._ws) {
+      this._ws.close();
+      this._ws = undefined;
     }
   }
 
@@ -327,7 +330,7 @@ export class ComfyUIClient {
   }
 
   async getImages(prompt: Prompt): Promise<ImagesResponse> {
-    if (!this.ws) {
+    if (!this._ws) {
       throw new Error(
         'WebSocket client is not connected. Please call connect() before interacting.',
       );
@@ -352,7 +355,7 @@ export class ComfyUIClient {
             if (!messageData.node) {
               const donePromptId = messageData.prompt_id;
 
-              logger.info(`Done executing prompt (ID: ${donePromptId})`);
+              this._logger.info(`Done executing prompt (ID: ${donePromptId})`);
 
               // Execution is done
               if (messageData.prompt_id === promptId) {
@@ -382,7 +385,7 @@ export class ComfyUIClient {
                 }
 
                 // Remove listener
-                this.ws?.off('message', onMessage);
+                this._ws?.off('message', onMessage);
                 return resolve(outputImages);
               }
             }
@@ -393,7 +396,7 @@ export class ComfyUIClient {
       };
 
       // Add listener
-      this.ws?.on('message', onMessage);
+      this._ws?.on('message', onMessage);
     });
   }
 }

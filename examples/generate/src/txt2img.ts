@@ -14,7 +14,13 @@ export const txt2img = async (
   const clientId = uuidv4();
 
   // Create client
-  const client = new ComfyUIClient(SERVER_ADDRESS, clientId);
+  const client = new ComfyUIClient({
+    serverAddress: SERVER_ADDRESS,
+    clientId,
+    logger: {
+      level: 'info',
+    },
+  });
 
   // Connect to server
   await client.connect();
